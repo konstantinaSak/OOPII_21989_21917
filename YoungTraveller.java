@@ -1,12 +1,11 @@
 
 // Age: [16,25]
-public class YoungTraveller extends Traveller {
-
+public class YoungTraveller extends Traveller{
+	
 	@Override
 	protected int calculate_similarity(Object City) {
-		// TODO Auto-generated method stub
+		double p = 0.8;
 		return 0;
 	}
 
-	
 }
