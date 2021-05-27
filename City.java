@@ -1,29 +1,32 @@
 import java.io.IOException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Set;
-import javax.swing.text.html.HTMLDocument.Iterator;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import weather.OpenWeatherMap;
-import wikipedia.MediaWiki;
-import java.util.Map;
-import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Set;
+
+import javax.swing.text.html.HTMLDocument.Iterator;
+
+import weather.OpenWeatherMap;
+import wikipedia.MediaWiki;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.sun.jdi.connect.spi.Connection;
 
 public class City  {
 
 	private int[] terms_vector;
 	private double[] geodesic_vector;
-	private double res;
+	private String name;
+	double res;
 
-	public City(String string, String appid) {
+	public City(String string) {
 		 terms_vector = new int[10];
 	     geodesic_vector = new double[2];
+	     String name = this.name;
 	     res = 0;
 	}
 	
@@ -52,15 +55,15 @@ public class City  {
 		this.geodesic_vector = geodesic_vector;
 	}
 	
-	public String toString(){
-        return this.terms_vector + " " + this.geodesic_vector + " " + this.res ;
-    }
+	//public String toString(){
+      //  return this.terms_vector + " " + this.geodesic_vector + " " + this.res ;
+    //}
 	
 	public void RetrieveData(String city, String country, String appid) throws  IOException {
 		 
 		 double lat, lon;
 		 String text; //κωδικας απο opendata
-		 ObjectMapper mapper = new ObjectMapper(); 
+		 ObjectMapper mapper = new ObjectMapper();
 		 OpenWeatherMap weather_obj = mapper.readValue(new URL("http://api.openweathermap.org/data/2.5/weather?q="+city+","+country+"&APPID="+appid+""), OpenWeatherMap.class);
 		 //System.out.println(city+" temperature: " + (weather_obj.getMain()).getTemp());
 		 //System.out.println(city+" lat: " + weather_obj.getCoord().getLat()+" lon: " + weather_obj.getCoord().getLon());
@@ -92,15 +95,15 @@ public class City  {
 	 	
 	 	 for(int j=0; j<cities.size(); j++) {
 	 		if(hm.containsValue(j)) {
-	 			cities.add(j);
+	 			cities.add(null);
 	 		}
-	 	}
-	 	hm.put("City1", new City("Rome", appid));
-	 	hm.put("City2", new City("Athens",appid));
-	 	hm.put("City3", new City("Corfu",appid));
-	 	hm.put("City4", new City("Berlin",appid));
-	 	hm.put("City5", new City("Paris",appid));
-	 	hm.put("City6", new City("Thessaloniki",appid));
+	 	 }
+	 	 hm.put("City1", new City("Rome"));
+	 	 hm.put("City2", new City("Athens"));
+	 	 hm.put("City3", new City("Corfu"));
+	 	 hm.put("City4", new City("Berlin"));
+	 	 hm.put("City5", new City("Paris"));
+	 	 hm.put("City6", new City("Thessaloniki"));
 	 	
 	 	Set<?> set = hm.entrySet();
 	 	Iterator i = (Iterator) set.iterator();
@@ -114,13 +117,8 @@ public class City  {
 	 	
 	}
 
-	public class Sortbyres implements Comparator<City>{
-	   public int compare(City a, City b){
-	       
-		   return (int) (a.res - b.res);
-	    }
-	}
-	static Connection db_can_obj = null;
+	
+	static java.sql.Connection db_can_obj = null;
 	static PreparedStatement db_prep_obj = null;
 	
 	private static void JDBCConnection() {
@@ -154,7 +152,7 @@ public class City  {
 		ResultSet rs = db_prep_obj.executeQuery();
 		
 		while(rs.next()) {
-			 int terms vector = rs.getInt(0); // edw tha eprepe na baloume ta xarakthristika ths kathe city
+			 int terms_vector = rs.getInt(0); // edw tha eprepe na baloume ta xarakthristika ths kathe city
 			                                  // gia na swthoun sto database.
 			
 			
@@ -162,5 +160,5 @@ public class City  {
 		
 	}
 	
-
 }
+

@@ -1,12 +1,31 @@
-import java.sql.Date;
+
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+
+import com.fasterxml.jackson.core.JsonGenerationException;
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.io.File;
-import com.fasterxml.jackson.core.JsonGenerationException;
 import java.io.IOException;
+import java.lang.Object;
+//import org.springframework.boot.test.json;
+//import org.springframework.boot.test.json.JacksonTester;
+import java.sql.Date;
 
-public abstract class Traveller extends City implements Comparable<Traveller> {
+
+public abstract class Traveller extends City {
+
+	
+
+
+	public Traveller(String string) {
+		super(string);
+		// TODO Auto-generated constructor stub
+	}
 
 	// hardcoded data
 	int prefer[] = { 10, 7, 3, 8, 0, 2, 10, 9, 5, 8 }; // 0.cafe, 1.sea, 2.museums, 3.restaurant, 4.stadium, 5.mountain,
@@ -15,48 +34,48 @@ public abstract class Traveller extends City implements Comparable<Traveller> {
 	int age = 18;
 	private long timestamp;
 	private double visit;
-	ArrayList<Traveller> travellers_array = new ArrayList<Traveller>();
-	JacksonTester tester = new JacksonTester();
+	ArrayList<Traveller> travellers_array = new ArrayList<>();
+	
+	//JacksonTester tester = new JacksonTester();
 
-	@Override
-	public int compareTo(Traveller traveller) {
-		return this.timestamp.compareTo(traveller.timestamp);
-	}
+	//public long compareTo(Traveller traveller) {
+		//return this.timestamp.compareTo(traveller.timestamp);
+	//}
 
-	public class ObjectSort(){
+	/*public void ObjectSort(){
 		List<Traveller> travellers = new ArrayList<>();
-		travellers.add(new Traveller(0.323132));
-		Collections.sort(travellers_array);
-	}
+		travellers.add(new YoungTraveller());
+		Collections.sort( travellers_array);
+	}*/
 
-		try
-		{
+	try{
 			for (int i = 0; i < travellers_array.size(); i++) {
 				Traveller traveller;
 
-				Date date = new Date();
+				Date date = new Date(timestamp);
 				traveller.setTimestamp(date.getTime());
 				travellers_array.add(traveller);
 				Thread.sleep(i);
 			}
-			tester.writeJSON(travellers_array);
+			//tester.writeJSON(travellers_array);
 		}catch(
-		JsonParseException e)
+		JsonParseException e1)
 		{
-			e.printStackTrace();
+			e1.printStackTrace();
 		}catch(
-		JsonMappingException e)
+		JsonMappingException e2)
 		{
-			e.printStackTrace();
+			e2.printStackTrace();
 		}catch(
 		IOException e)
 		{
 			e.printStackTrace();
 		}
 
-        public void writeJSON(ArrayList<Traveller> arrayOfTr) throws JsonGenerationException, JsonMappingException, IOExcepetion{
+        public  void writeJSON(ArrayList<Object> arrayOfTr )  { 
+        
 	         ObjectMapper mapper = new ObjectMapper();
-	          mapper.writeValue(new File("arraylist.json"), arrayOfTr);
+	         mapper.writeValue(new File("arraylist.json"), arrayOfTr);
         }
 
 		public ArrayList<Traveller> readJSON() throws JsonParseException, JsonMappingException, IOException {
@@ -71,6 +90,14 @@ public abstract class Traveller extends City implements Comparable<Traveller> {
 
 		public void setTimestamp(long timestamp) {
 			this.timestamp = timestamp;
+		}
+		
+		public double getVisit() {
+			return visit;
+		}
+
+		public void setVisit(double visit) {
+			this.visit = visit;
 		}
 
 		protected abstract double calculate_similarity(Object City);
@@ -97,14 +124,18 @@ public abstract class Traveller extends City implements Comparable<Traveller> {
 		}
 
 		public Object compare_cities(ArrayList<City> cities) {
+			for (int i = 0; i < cities.size(); i++) {
+				System.out.println(toString());
+			}
 			Collections.sort(cities, new Sortbyres()); // ταξινομηση στο cities με βαση το similarity
 			System.out.println("\nSorted by similarity");
-			for (int i = 0; i < cities.size(); i++)
+			for (int i = 0; i < cities.size(); i++) {
 				System.out.println(toString());
-
+			}
 			return cities.get(0);
 		}
-
+        
+		
 		public ArrayList<City> compare_cities(ArrayList<City> cities, int k) { // υπερφορτωση
 			Collections.sort(cities, new Sortbyres());
 			ArrayList<City> next = new ArrayList<City>();
@@ -116,6 +147,13 @@ public abstract class Traveller extends City implements Comparable<Traveller> {
 
 		}
 
+		class Sortbyres implements Comparator<City>{
+			   public int compare(City a, City b){
+			       
+				   return (int) (b.res - b.res);
+			    }
+			}
+		
 		ArrayList<Traveller> travellers = new ArrayList<Traveller>();
 
 		public double freeTicket(Object City) {
@@ -127,5 +165,7 @@ public abstract class Traveller extends City implements Comparable<Traveller> {
 			}
 			return max;
 		}
+
+		
 
 }
