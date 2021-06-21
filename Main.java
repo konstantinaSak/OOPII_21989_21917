@@ -14,25 +14,39 @@ public class Main {
 	
 	public static void main(String[] args) throws IOException  {
 		
+		
+		
 		ArrayList<City> cities = new  ArrayList<City>();  
 		
-		Traveller myTraveller;
-		myTraveller =new YoungTraveller(); 
-		
-        for(int i = 0; i<cities.size(); i++ ) {
-		   if (myTraveller.age >= 16 && myTraveller.age <= 25) {
+		try{
+			Traveller myTraveller;
+			myTraveller = new YoungTraveller();
+			for(int i = 0; i<cities.size(); i++ ) {
+		        if (myTraveller.age >= 16 && myTraveller.age <= 25) {
 			
-			myTraveller.calculate_similarity(cities.get(i));
+			    myTraveller.calculate_similarity(cities.get(i));
 			
-		  } else if (myTraveller.age> 25 && myTraveller.age <= 60) {
-			myTraveller =new MiddleTraveller(); 
-			myTraveller.calculate_similarity(cities.get(i));
+		        } else if (myTraveller.age> 25 && myTraveller.age <= 60) {
+			        myTraveller =new MiddleTraveller(); 
+			        myTraveller.calculate_similarity(cities.get(i));
 			
-		   } else if (myTraveller.age > 60 && myTraveller.age <= 115) {
-			myTraveller =new ElderTraveller(); 
-			myTraveller.calculate_similarity(cities.get(i));
-		   }
+		        } else if (myTraveller.age > 60 && myTraveller.age <= 115) {
+			        myTraveller =new ElderTraveller(); 
+			        myTraveller.calculate_similarity(cities.get(i));
+		        }
+            }
+        
+		}catch(InvalidAgeException e) {
+        	System.out.println(e.getMessage());
+        	
         }
+			
+			
+		
+		 
+		
+            
+		
 		try{
 		    	String appid ="98ad73768d0e83675c9c379dd3f76175";
 		        City a1 = new City();

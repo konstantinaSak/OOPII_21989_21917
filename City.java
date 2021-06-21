@@ -16,7 +16,19 @@ import wikipedia.MediaWiki;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.sun.jdi.connect.spi.Connection;
 
-public class City  {
+
+
+
+
+import java.util.Comparator;
+
+import java.util.Map;
+
+
+
+
+
+public class City extends Thread {
 
 	private int[] terms_vector;
 	private double[] geodesic_vector;
@@ -59,6 +71,8 @@ public class City  {
       //  return this.terms_vector + " " + this.geodesic_vector + " " + this.res ;
     //}
 	
+	
+	
 	public void RetrieveData(String city, String country, String appid) throws  IOException {
 		 
 		 double lat, lon;
@@ -72,6 +86,14 @@ public class City  {
 		 MediaWiki mediaWiki_obj =  mapper.readValue(new URL("https://en.wikipedia.org/w/api.php?action=query&prop=extracts&titles="+city+"&format=json&formatversion=2"),MediaWiki.class);
 		 //System.out.println(city+" Wikipedia article: "+mediaWiki_obj.getQuery().getPages().get(0).getExtract());	 
 	     text =	mediaWiki_obj.getQuery().getPages().get(0).getExtract();
+	     
+	     Thread thread1 = new Thread((Runnable) mapper);
+	     System.out.println("thread1 start");
+	     thread1.start();
+	     
+	     Thread thread2 = new Thread((Runnable) mediaWiki_obj);
+	     System.out.println("thread2 start");
+	     thread2.start();
 	     
 	     terms_vector[0] = (CountWords.countCriterionfCity(text, "cafe")) ; // γεμιζουμε τους πινακες
 	     terms_vector[1] = (CountWords.countCriterionfCity(text, "sea"));
@@ -90,6 +112,24 @@ public class City  {
 	     //System.out.println(getTerms_vector());
 	     //System.out.println(getGeodesic_vector());
 	     
+	    /* Runnable wiki_obj = new Runnable;
+	     Thread thread1 = new Thread(wiki_obj);
+	     thread1.setDaemon(true);
+	     thread1.setName(mediaWiki_obj);
+	     System.out.println("Starting wikipedia thread...");
+	     thread1.start();
+	     
+	     Runnable weather = new Runnable(mapper);
+	     Thread thread2 = new Thread(weather);
+	     thread2.setPriority(Thread.MIN_PRIORITY);
+	     thread2.setDaemon(true);
+	     System.out.println("Starting open weather map thread...");
+	     thread2.start(); */
+	 	
+	     
+	     
+	     
+	     
 	     ArrayList<City> cities = new ArrayList<>();
 	 	 HashMap<String,City> hm = new HashMap<String,City>();
 	 	
@@ -98,6 +138,9 @@ public class City  {
 	 			cities.add(null);
 	 		}
 	 	 }
+	 	 
+	 	
+	 	 
 	 	 hm.put("City1", new City("Rome"));
 	 	 hm.put("City2", new City("Athens"));
 	 	 hm.put("City3", new City("Corfu"));
@@ -159,6 +202,9 @@ public class City  {
 		}
 		
 	}
+
+	
+	
 	
 }
 

@@ -3,6 +3,9 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
+import java.util.Random;
 
 import com.fasterxml.jackson.core.JsonGenerationException;
 import com.fasterxml.jackson.core.JsonParseException;
@@ -22,19 +25,27 @@ public abstract class Traveller extends City {
 	
 
 
-	public Traveller(String string) {
-		super(string);
-		// TODO Auto-generated constructor stub
-	}
 
 	// hardcoded data
 	int prefer[] = { 10, 7, 3, 8, 0, 2, 10, 9, 5, 8 }; // 0.cafe, 1.sea, 2.museums, 3.restaurant, 4.stadium, 5.mountain,
 														// 6.airplane. 7.desert, 8.sights, 9.camping
 	double loc[] = { 37.9795, 23.7162 }; // latitude , longitude of Athens
-	int age = 18;
+	int age = 10;
 	private long timestamp;
-	private double visit;
+	private String visit;
+	private int[] Criteria = new int[8];
+	public static final int MAX_CITIES = 5;
+    private String[] candidate_cities = new String[MAX_CITIES];
 	ArrayList<Traveller> travellers_array = new ArrayList<>();
+
+	public Traveller(String string) throws InvalidAgeException {
+		super(string);
+		if(age<16 || age>115) {
+			throw new InvalidAgeException("age can not be under 16 and over 115");
+		}else {
+			this.age = age;
+		}
+   
 	
 	//JacksonTester tester = new JacksonTester();
 
@@ -72,7 +83,9 @@ public abstract class Traveller extends City {
 			e.printStackTrace();
 		}
 
-        public  void writeJSON(ArrayList<Object> arrayOfTr )  { 
+       
+
+		public  void writeJSON(ArrayList<Object> arrayOfTr ) throws JsonGenerationException, JsonMappingException, IOException  { 
         
 	         ObjectMapper mapper = new ObjectMapper();
 	         mapper.writeValue(new File("arraylist.json"), arrayOfTr);
@@ -83,6 +96,14 @@ public abstract class Traveller extends City {
 			ArrayList<Traveller> arrayOftr = mapper.readValue(new File("arraylist.json"), ArrayList.class);
 			return arrayOftr;
 		}
+		
+		 public int[] getCriteria() {
+				return Criteria;
+			}
+
+			public void setCriteria(int[] criteria) {
+				Criteria = criteria;
+			}
 
 		public long getTimestamp() {
 			return timestamp;
@@ -92,12 +113,12 @@ public abstract class Traveller extends City {
 			this.timestamp = timestamp;
 		}
 		
-		public double getVisit() {
+		public String getVisit() {
 			return visit;
 		}
 
-		public void setVisit(double visit) {
-			this.visit = visit;
+		public void setVisit(String string) {
+			this.visit = string;
 		}
 
 		protected abstract double calculate_similarity(Object City);
@@ -165,7 +186,36 @@ public abstract class Traveller extends City {
 			}
 			return max;
 		}
+		
+		private static int innerDot(int[] currentTraveller, int[] candidateTraveller) {
+			int sum=0;
+			for (int i=0; i<currentTraveller.length;i++)
+				sum+=currentTraveller[i]*candidateTraveller[i];
+			return sum;
+				
+		}
+
+		Random r = new Random();
+		for (int i=0; i<100; i++) {	//We add 100 historical Travelers in the Collection.
+			Traveller curTraveller = new Traveller("Traveller_"+Integer.toString(i),r.nextInt(90),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2));  		
+			curTraveller.setVisit("City_"+Integer.toString(i)); //Will the Traveler_i visit the City_i ?
+			travellers.add(curTraveller);		
+		}	
+		System.out.println(collectionTravellers);
+		
+		//We have a new candidate traveler.
+		Traveller candidateTraveller = new Traveller("Traveller_Candidate",r.nextInt(90),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2),r.nextInt(2));  		
+		int[] candidateTravellerCriteria=candidateTraveller.getCriteria(); //The criteria of the candidate traveler.
+		
+		//We see for each city what is the rank of similarity (dot product) between the candidate Traveller criteria and all the Travellers of the Collection.
+		Map <String,Integer> cityToRank= travellers.stream().collect(Collectors.toMap(i->i.getVisit(),i->innerDot(i.getCriteria(),candidateTravellerCriteria)));
+		cityToRank.forEach((k,v)->System.out.println("city:"+k+" rank: "+v));
+		
+		//We print the Traveller who has the highest Rank (similarity) (dot product).
+		Optional<RecommendedCity> recommendedCity=
+				travellers.stream().map(i-> new RecommendedCity(i.getVisit(),innerDot(i.getCriteria(),candidateTravellerCriteria))).max(Comparator.comparingInt(RecommendedCity::getRank));
+				
+		System.out.println("The Recommended City:"+recommendedCity.get().getCity());
 
 		
-
 }
